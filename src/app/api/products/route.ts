@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import puppeteer, { Browser } from "puppeteer";
-import chromium from "@sparticuz/chromium";
+import chromium from "@sparticuz/chromium-min";
 export interface IProduct {
   productName: null | string;
   price: null | number;
