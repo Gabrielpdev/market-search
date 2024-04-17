@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import puppeteer from "puppeteer";
-
+import chromium from "@sparticuz/chromium-min";
 export interface IProduct {
   productName: null | string;
   price: null | number;
@@ -49,7 +49,13 @@ export async function GET(request: NextRequest) {
 
 async function getProductsOnKomprao(search: string) {
   const browser = await puppeteer.launch({
-    headless: true,
+    args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath(
+      `https://github.com/Sparticuz/chromium/releases/download/v116.0.0/chromium-v116.0.0-pack.tar`
+    ),
+    headless: chromium.headless,
+    ignoreHTTPSErrors: true,
   });
   let page = await browser.newPage();
 
@@ -157,7 +163,15 @@ async function getProductsOnKomprao(search: string) {
 }
 
 async function getProductsOnGiassi(search: string) {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath(
+      `https://github.com/Sparticuz/chromium/releases/download/v116.0.0/chromium-v116.0.0-pack.tar`
+    ),
+    headless: chromium.headless,
+    ignoreHTTPSErrors: true,
+  });
   const page = await browser.newPage();
 
   await page.goto(`https://www.giassi.com.br/${search}?map=ft&_q=${search}`);
