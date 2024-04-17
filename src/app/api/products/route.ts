@@ -9,6 +9,7 @@ export interface IProduct {
   // promoPrice?: null | number;
   // priceTotalUnit?: null | number;
 }
+export const maxDuration = 20;
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
