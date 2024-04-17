@@ -4,7 +4,12 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { v4 } from "uuid";
 
-import { IProduct } from "./api/products/route";
+export interface IProduct {
+  productName: null | string;
+  price: null | number;
+  img: string;
+  market: string;
+}
 
 export default function Home() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -16,7 +21,7 @@ export default function Home() {
     try {
       setLoading(true);
       const res = await fetch(
-        `/api/products?search=${inputRef.current?.value}`
+        `https://market-search-api.onrender.com/products?search=${inputRef.current?.value}`
       );
       const { data } = await res.json();
 
