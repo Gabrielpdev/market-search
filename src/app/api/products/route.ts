@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import puppeteer from "puppeteer";
-import chromium from "@sparticuz/chromium-min";
+import puppeteer, { Browser } from "puppeteer";
+import chromium from "@sparticuz/chromium";
 export interface IProduct {
   productName: null | string;
   price: null | number;
@@ -20,10 +20,21 @@ export async function GET(request: NextRequest) {
       { status: 400 }
     );
 
+  const browser = await puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    // executablePath: await chromium.executablePath(),
+
+    executablePath: await chromium.executablePath(),
+    headless: chromium.headless,
+    ignoreHTTPSErrors: true,
+  });
+
   const [kompraoProducts, giassiProducts] = await Promise.all([
-    getProductsOnKomprao(query),
-    getProductsOnGiassi(query),
+    getProductsOnKomprao(query, browser),
+    getProductsOnGiassi(query, browser),
   ]);
+  await browser.close();
 
   const allData = [...kompraoProducts, ...giassiProducts];
 
@@ -47,14 +58,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ data: sortedData }, { status: 200 });
 }
 
-async function getProductsOnKomprao(search: string) {
-  const browser = await puppeteer.launch({
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
-    ignoreHTTPSErrors: true,
-  });
+async function getProductsOnKomprao(search: string, browser: Browser) {
   let page = await browser.newPage();
 
   const response = await page.goto(
@@ -155,19 +159,10 @@ async function getProductsOnKomprao(search: string) {
     products.push(productObj);
   }
 
-  await browser.close();
-
   return products;
 }
 
-async function getProductsOnGiassi(search: string) {
-  const browser = await puppeteer.launch({
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
-    ignoreHTTPSErrors: true,
-  });
+async function getProductsOnGiassi(search: string, browser: Browser) {
   const page = await browser.newPage();
 
   await page.goto(`https://www.giassi.com.br/${search}?map=ft&_q=${search}`);
@@ -242,8 +237,6 @@ async function getProductsOnGiassi(search: string) {
 
     products.push(productObj);
   }
-
-  await browser.close();
 
   return products;
   // .sort((a, b) => {
