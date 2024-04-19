@@ -1,9 +1,8 @@
 "use client";
-import { useContext, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import Image from "next/image";
 import { v4 } from "uuid";
-import { UserContext } from "@/providers/firebase";
 
 export interface IProduct {
   productName: null | string;
@@ -22,7 +21,7 @@ export interface IProduct {
 // const url = targetAudience;
 
 export default function Home() {
-  const { user } = useContext(UserContext);
+  // const { user } = useContext(UserContext);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -38,14 +37,15 @@ export default function Home() {
       // console.log(token);
       // console.info(token.data);
 
-      const token = await user?.getIdToken(true);
-      console.log(token);
+      // const token = await user?.getIdToken(true);
+      // console.log(token);
 
       const res = await fetch(
-        `https://southamerica-east1-market-search-api.cloudfunctions.net/market-search-api/?search=${inputRef.current?.value}`,
+        `https://southamerica-east1-market-search-api.cloudfunctions.net/products/?search=${inputRef.current?.value}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            "Allow-Control-Allow-Origin": "*",
+            "content-type": "application/json",
           },
         }
       );
