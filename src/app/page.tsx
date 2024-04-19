@@ -1,8 +1,9 @@
 "use client";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 
 import Image from "next/image";
 import { v4 } from "uuid";
+import { UserContext } from "@/providers/firebase";
 
 export interface IProduct {
   productName: null | string;
@@ -11,7 +12,18 @@ export interface IProduct {
   market: string;
 }
 
+/**
+ * TODO(developer): Uncomment these variables before running the sample.
+ */
+
+// Cloud Functions uses your function's url as the `targetAudience` value
+// const targetAudience = 'https://project-region-projectid.cloudfunctions.net/myFunction';
+// For Cloud Functions, endpoint (`url`) and `targetAudience` should be equal
+// const url = targetAudience;
+
 export default function Home() {
+  const { user } = useContext(UserContext);
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -20,12 +32,25 @@ export default function Home() {
   const handleList = async () => {
     try {
       setLoading(true);
+
+      // const res2 = await fetch(`api/token`);
+      // const { data: token } = await res2.json();
+      // console.log(token);
+      // console.info(token.data);
+
+      const token = await user?.getIdToken(true);
+      console.log(token);
+
       const res = await fetch(
-        `https://market-search-api.onrender.com/products?search=${inputRef.current?.value}`
+        `https://southamerica-east1-market-search-api.cloudfunctions.net/market-search-api/?search=${inputRef.current?.value}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       const { data } = await res.json();
 
-      console.log(data);
       setProducts(data);
     } catch (err) {
       console.error(err);
@@ -40,8 +65,6 @@ export default function Home() {
     }
     return "/giassi.svg";
   };
-
-  console.log(products);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
